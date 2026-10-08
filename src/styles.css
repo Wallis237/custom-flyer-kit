@@ -210,6 +210,9 @@ h1 { font-size: 36px; line-height: 1.2; font-weight: 700; margin: 0; }
 .upload-prompt { padding: 0; height: auto; font-size: 12px; font-weight: 600; gap: 4px; }
 .upload-prompt span { color: var(--muted-foreground); font-weight: 400; }
 .file-note { font-size: 10px; color: var(--muted-foreground); }
+.remove-background { width: 100%; margin-top: 12px; height: 39px; font-size: 12px; font-weight: 500; box-shadow: none; justify-content: flex-start; padding: 0 12px; }
+.remove-background svg { color: var(--primary); }
+.optional-label { margin-left: auto; font-size: 8px; letter-spacing: .7px; color: var(--muted-foreground); }
 .privacy-note { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--muted-foreground); margin-top: 13px; }
 .privacy-note svg { width: 13px; height: 13px; }
 .upload-zone.has-photo { min-height: 110px; padding: 12px; flex-direction: row; gap: 12px; }
@@ -219,6 +222,7 @@ h1 { font-size: 36px; line-height: 1.2; font-weight: 700; margin: 0; }
 .uploaded-info>span { display: block; font-size: 10px; color: var(--muted-foreground); margin-top: 5px; }
 .change-photo { padding: 0; height: 25px; font-size: 10px; }
 .change-photo svg { width: 12px; }
+.restore-photo { height: 25px; padding: 0; font-size: 10px; }
 .photo-adjustments { margin-top: 17px; }
 .photo-adjustments label { display: flex; justify-content: space-between; font-size: 11px; }
 .photo-adjustments input { width: 100%; accent-color: var(--primary); margin: 9px 0; }

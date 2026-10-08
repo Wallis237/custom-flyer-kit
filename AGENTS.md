@@ -11,5 +11,5 @@
 
 ## Flyer studio architecture
 - Render the personalized flyer in a browser canvas using a single prepared template asset and shared drawing function, so preview and PNG download always match.
-- Keep uploaded portraits entirely in the browser as an object URL; no photo upload or persistent storage is required.
+- Process uploaded portraits only in the browser with a dynamically imported background-removal library; no photo upload or persistent storage is required.
 - Keep event constants and personal-detail/photo validation in the shared flyer module, with concrete behavior tests.
