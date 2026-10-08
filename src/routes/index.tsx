@@ -126,7 +126,7 @@ function Index() {
           <div className="section-heading"><h2>Personalize your flyer</h2><span className="step-count">{complete} / 3 complete</span></div>
           <div className="section-intro">Made for the next generation of doers.</div>
           <div className="form-section"><div className="section-label"><span className="step-number">01</span><h3>Your details</h3></div>
-            <label htmlFor="full-name">Full name <span>*</span></label><Input id="full-name" autoComplete="name" placeholder="e.g. Kimbi Denis Kinjuo" maxLength={60} value={name} onChange={e => { setName(e.target.value); setDownloaded(false); }} className="details-input" />
+            <label htmlFor="full-name">Full name <span>*</span></label><Input id="full-name" autoComplete="name" placeholder="e.g Tarshi Williams" maxLength={60} value={name} onChange={e => { setName(e.target.value); setDownloaded(false); }} className="details-input" />
             <label htmlFor="job-title">Title / profession <span>*</span></label><Input id="job-title" autoComplete="organization-title" placeholder="e.g. Software Engineer" maxLength={60} value={title} onChange={e => { setTitle(e.target.value); setDownloaded(false); }} className="details-input" />
           </div>
           <div className="form-section photo-section"><div className="section-label"><span className="step-number">02</span><h3>Your portrait</h3></div>
