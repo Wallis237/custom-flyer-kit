@@ -38,6 +38,22 @@ function Index() {
   const onReady = useCallback((canvas: HTMLCanvasElement) => { canvasRef.current = canvas; }, []);
   const onError = useCallback((message: string) => setError(message), []);
   useEffect(() => () => { if (photo) URL.revokeObjectURL(photo); }, [photo]);
+  const bgConfig = useCallback((device: 'gpu' | 'cpu') => ({ model: 'isnet_quint8' as const, device, output: { format: 'image/png' as const } }), []);
+  const preloaded = useRef<Promise<unknown> | null>(null);
+  function preloadTools() {
+    if (preloaded.current) return;
+    preloaded.current = import('@imgly/background-removal').then((m) => m.preload(bgConfig('cpu'))).catch(() => { preloaded.current = null; });
+  }
+  async function shrink(file: File, max = 900): Promise<Blob> {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1) { bitmap.close(); return file; }
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bitmap.width * scale); canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    return await new Promise<Blob>((resolve, reject) => canvas.toBlob((b) => b ? resolve(b) : reject(new Error('resize')), 'image/jpeg', 0.92));
+  }
   function upload(file?: File) {
     if (!file) return;
     const issue = validatePhoto(file);
@@ -45,16 +61,25 @@ function Index() {
     requestId.current += 1;
     setError(''); setOriginal(file); setPhoto(URL.createObjectURL(file));
     setZoom(1); setPosition(0); setRemoved(false); setDownloaded(false); setRemoving(false);
+    preloadTools();
   }
   async function removeBackground() {
     if (!original || removing) return;
     const id = ++requestId.current;
     setRemoving(true); setError(''); setProgress('Preparing photo…');
     try {
-      const { removeBackground: remove } = await import('@imgly/background-removal');
-      const result = await remove(original, { model: 'isnet_quint8', device: 'cpu', progress: (key, current, total) => {
+      const [{ removeBackground: remove }, small] = await Promise.all([import('@imgly/background-removal'), shrink(original)]);
+      const progressFn = (key: string, current: number, total: number) => {
         if (requestId.current === id) setProgress(key.startsWith('fetch') ? `Preparing photo tools… ${Math.round(current / total * 100)}%` : 'Removing background…');
-      } });
+      };
+      const hasGpu = typeof navigator !== 'undefined' && 'gpu' in navigator;
+      let result: Blob;
+      try {
+        result = await remove(small, { ...bgConfig(hasGpu ? 'gpu' : 'cpu'), progress: progressFn });
+      } catch (e) {
+        if (!hasGpu) throw e;
+        result = await remove(small, { ...bgConfig('cpu'), progress: progressFn });
+      }
       if (requestId.current !== id) return;
       setPhoto(URL.createObjectURL(result)); setRemoved(true);
     } catch {
