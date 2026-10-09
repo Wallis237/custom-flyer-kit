@@ -4,12 +4,12 @@ import { ArrowDownToLine, ArrowLeft, ArrowRight, Check, ImagePlus, LoaderCircle,
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FlyerPreview } from '@/components/flyer-preview';
-import { EVENT_DATE, personalDetailsSchema, validatePhoto } from '@/lib/flyer';
+import { EVENT_DATE, CATEGORY_OPTIONS, personalDetailsSchema, validatePhoto } from '@/lib/flyer';
 
 export const Route = createFileRoute('/')({
   head: () => ({ meta: [
     { title: 'AI Workflow Lab — Techsquad Flyer Maker' },
-    { name: 'description', content: 'Create your personalized Techsquad Cameroon AI Workflow Lab attendee flyer for October 23, 2026. Add your name, title and photo, then download.' },
+    { name: 'description', content: 'Create your personalized Techsquad Cameroon AI Workflow Lab attendee flyer for October 16, 2026. Add your name, category and photo, then download.' },
     { property: 'og:title', content: 'AI Workflow Lab — Your attendee flyer' },
     { property: 'og:description', content: 'Personalize and download your Techsquad Cameroon workshop flyer.' },
     { property: 'og:type', content: 'website' },
@@ -20,7 +20,7 @@ export const Route = createFileRoute('/')({
 
 function Index() {
   const [name, setName] = useState('');
-  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState<typeof CATEGORY_OPTIONS[number] | ''>('');
   const [photo, setPhoto] = useState<string | null>(null);
   const [original, setOriginal] = useState<File | null>(null);
   const [zoom, setZoom] = useState(1);
@@ -88,12 +88,12 @@ function Index() {
   }
   function reset() {
     requestId.current += 1;
-    setName(''); setTitle(''); setPhoto(null); setOriginal(null); setZoom(1); setPosition(0);
+    setName(''); setCategory(''); setPhoto(null); setOriginal(null); setZoom(1); setPosition(0);
     setError(''); setRemoved(false); setRemoving(false); setDownloaded(false);
     if (inputRef.current) inputRef.current.value = '';
   }
   async function download() {
-    const parsed = personalDetailsSchema.safeParse({ name, title });
+    const parsed = personalDetailsSchema.safeParse({ name, category });
     if (!parsed.success) { setError(parsed.error.issues[0]?.message || 'Enter your details.'); return; }
     if (!photo) { setError('Add your portrait before downloading.'); return; }
     const canvas = canvasRef.current;
@@ -112,7 +112,7 @@ function Index() {
     } catch (err) { setError(err instanceof Error ? err.message : 'Download failed. Please try again.'); }
     finally { setExporting(false); }
   }
-  const complete = [Boolean(name.trim()), Boolean(title.trim()), Boolean(photo)].filter(Boolean).length;
+  const complete = [Boolean(name.trim()), Boolean(category), Boolean(photo)].filter(Boolean).length;
   return <div className="app-shell">
     <header className="app-header">
       <a href="/" className="brand"><img src="/favicon.png" alt="Techsquad" /><span>TECHSQUAD<span className="brand-country">CAMEROON</span></span></a>
@@ -120,33 +120,33 @@ function Index() {
       <span className="workshop-chip"><span /> AI WORKFLOW LAB</span>
     </header>
     <main className="studio-main">
-      <div className="page-heading"><div><div className="eyebrow"><span className="eyebrow-line" /> MAKE IT YOURS</div><h1>Your seat. Your flyer.</h1><p>A little personal touch for a big step forward.</p></div><div className="event-summary"><span className="event-dot" /><div><strong>{EVENT_DATE}</strong><span>7:00pm – 9:00pm · Online</span></div></div></div>
+      <div className="page-heading"><div><div className="eyebrow"><span className="eyebrow-line" /> MAKE IT YOURS</div><h1>Your seat. Your flyer.</h1><p>A little personal touch for a big step forward.</p></div></div>
       <div className="studio-layout">
         <section className="editor" aria-label="Personalize your flyer">
           <div className="section-heading"><h2>Personalize your flyer</h2><span className="step-count">{complete} / 3 complete</span></div>
           <div className="section-intro">Made for the next generation of doers.</div>
           <div className="form-section"><div className="section-label"><span className="step-number">01</span><h3>Your details</h3></div>
-            <label htmlFor="full-name">Full name <span>*</span></label><Input id="full-name" autoComplete="name" placeholder="e.g Tarshi Williams" maxLength={60} value={name} onChange={e => { setName(e.target.value); setDownloaded(false); }} className="details-input" />
-            <label htmlFor="job-title">Title / profession <span>*</span></label><Input id="job-title" autoComplete="organization-title" placeholder="e.g. Software Engineer" maxLength={60} value={title} onChange={e => { setTitle(e.target.value); setDownloaded(false); }} className="details-input" />
+            <label htmlFor="full-name">Full name <span>*</span></label><Input id="full-name" autoComplete="name" placeholder="e.g Tarshi Williams" maxLength={60} value={name} onChange={e => { setName(e.target.value); }} />
+            <label htmlFor="category">Category <span>*</span></label><select id="category" value={category} onChange={e => setCategory(e.target.value as typeof category)} className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"><option value="">Select your category</option>{CATEGORY_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}</select>
           </div>
           <div className="form-section photo-section"><div className="section-label"><span className="step-number">02</span><h3>Your portrait</h3></div>
             <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" aria-label="Upload portrait" onChange={e => upload(e.target.files?.[0])} />
-            <div className={`upload-zone ${dragging ? 'is-dragging' : ''} ${photo ? 'has-photo' : ''}`} onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={e => { e.preventDefault(); setDragging(false); upload(e.dataTransfer.files[0]); }}>
-              {photo ? <><img className="uploaded-thumbnail" src={photo} alt="Your uploaded portrait" /><div className="uploaded-info"><strong>{original?.name}</strong><span>{removed ? 'Background removed' : 'Photo added'}</span><Button variant="link" onClick={() => inputRef.current?.click()} className="change-photo"><Upload />Change photo</Button></div><Button variant="ghost" size="icon" aria-label="Remove photo" title="Remove photo" onClick={() => { requestId.current++; setPhoto(null); setOriginal(null); setRemoving(false); setRemoved(false); if (inputRef.current) inputRef.current.value = ''; }}><X /></Button></> : <><div className="upload-icon"><ImagePlus /></div><Button variant="link" onClick={() => inputRef.current?.click()} className="upload-prompt">Choose a photo <span>or drag it here</span></Button><span className="file-note">JPG, PNG or WebP · Up to 10 MB</span></>}
+            <div className={`upload-zone ${dragging ? 'is-dragging' : ''} ${photo ? 'has-photo' : ''}`} onDragOver={e => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={e => { e.preventDefault(); setDragging(false); upload(e.dataTransfer.files?.[0]); }} onClick={() => inputRef.current?.click()}>
+              {photo ? <><img className="uploaded-thumbnail" src={photo} alt="Your uploaded portrait" /><div className="uploaded-info"><strong>{original?.name}</strong><span>{removed ? 'Background removed' : 'Ready to use'}</span></div></> : <><ImagePlus /><div><strong>Add your portrait</strong><span>Drag or click to upload</span></div></>}
             </div>
-            <Button variant="outline" className="remove-background" onClick={removeBackground} disabled={!photo || removing || removed}>{removing ? <LoaderCircle className="spin" /> : removed ? <Check /> : <Sparkles />}{removing ? progress : removed ? 'Background removed' : 'Remove background'}<span className="optional-label">{!removed && !removing ? 'OPTIONAL' : ''}</span></Button>
+            <Button variant="outline" className="remove-background" onClick={removeBackground} disabled={!photo || removing || removed}>{removing ? <LoaderCircle className="spin" /> : removed ? <Check /> : <Sparkles />}{removing ? 'Removing…' : removed ? 'Removed' : 'Remove background'}</Button>
             {removed && <Button variant="link" className="restore-photo" onClick={() => { if (original) { setPhoto(URL.createObjectURL(original)); setRemoved(false); } }}>Restore original photo</Button>}
-            {photo && <div className="photo-adjustments"><label htmlFor="zoom">Photo zoom <span>{Math.round(zoom * 100)}%</span></label><input id="zoom" type="range" min="1" max="2.5" step="0.05" value={zoom} onChange={e => setZoom(Number(e.target.value))} /><label htmlFor="position">Vertical position</label><input id="position" type="range" min="-150" max="150" step="1" value={position} onChange={e => setPosition(Number(e.target.value))} /></div>}
+            {photo && <div className="photo-adjustments"><label htmlFor="zoom">Photo zoom <span>{Math.round(zoom * 100)}%</span></label><input id="zoom" type="range" min="1" max="2.5" step="0.05" value={zoom} onChange={e => setZoom(Number(e.target.value))} /><label htmlFor="position">Position <span>{Math.round(position * 100)}%</span></label><input id="position" type="range" min="0" max="1" step="0.05" value={position} onChange={e => setPosition(Number(e.target.value))} /></div>}
             <div className="privacy-note"><ShieldCheck />Your photo stays on your device.</div>
           </div>
           <div className="export-section"><div className="section-label"><span className="step-number">03</span><h3>Make it official</h3></div>
             {error && <p className="form-error" role="alert">{error}</p>}
-            <Button className="download-button" onClick={download} disabled={exporting || removing}>{exporting ? <LoaderCircle className="spin" /> : downloaded ? <Check /> : <ArrowDownToLine />}{exporting ? 'Saving your flyer…' : downloaded ? 'Download again' : 'Download my flyer'}<ArrowRight /></Button>
-            {downloaded && <p className="download-success" role="status">Your flyer is ready in your device’s downloads.</p>}
+            <Button className="download-button" onClick={download} disabled={exporting || removing}>{exporting ? <LoaderCircle className="spin" /> : downloaded ? <Check /> : <ArrowDownToLine />}{exporting ? 'Exporting…' : downloaded ? 'Downloaded' : 'Download your flyer'}</Button>
+            {downloaded && <p className="download-success" role="status">Your flyer is ready in your device's downloads.</p>}
             <div className="export-bottom"><span>PNG image · High resolution</span><Button variant="ghost" size="sm" onClick={reset}><RotateCcw />Start over</Button></div>
           </div>
         </section>
-        <section className="preview-section" aria-label="Flyer preview"><div className="preview-heading"><span><span className="live-dot" /> LIVE PREVIEW</span><span>PORTRAIT · 9:16</span></div><div className="preview-stage"><div className="flyer-wrap"><FlyerPreview name={name} title={title} photo={photo} zoom={zoom} position={position} onReady={onReady} onError={onError} /></div></div><div className="preview-footer"><span><Check />Official workshop template</span><span>23 OCT 2026</span></div></section>
+        <section className="preview-section" aria-label="Flyer preview"><div className="preview-heading"><span><span className="live-dot" /> LIVE PREVIEW</span><span>PORTRAIT · 9:16</span></div><div className="preview-viewport"><FlyerPreview name={name} category={category} photo={photo} zoom={zoom} position={position} onReady={onReady} onError={onError} /></div></section>
       </div>
     </main>
     <footer className="app-footer"><span>LEARN <span>/</span> APPLY <span>/</span> GROW</span><span>Made for the Techsquad community <ArrowLeft /></span></footer>
