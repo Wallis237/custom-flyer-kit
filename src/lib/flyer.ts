@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const EVENT_DATE = '17th October, 2026';
+export const EVENT_DATE = '16th October, 2026';
 export const FLYER_WIDTH = 1536;
 export const FLYER_HEIGHT = 2752;
 
