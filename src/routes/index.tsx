@@ -146,7 +146,7 @@ function Index() {
             <div className="export-bottom"><span>PNG image · High resolution</span><Button variant="ghost" size="sm" onClick={reset}><RotateCcw />Start over</Button></div>
           </div>
         </section>
-        <section className="preview-section" aria-label="Flyer preview"><div className="preview-heading"><span><span className="live-dot" /> LIVE PREVIEW</span><span>PORTRAIT · 9:16</span></div><div className="preview-stage"><div className="flyer-wrap"><FlyerPreview name={name} title={title} photo={photo} zoom={zoom} position={position} onReady={onReady} onError={onError} /></div></div><div className="preview-footer"><span><Check />Official workshop template</span><span>23 OCT 2026</span></div></section>
+        <section className="preview-section" aria-label="Flyer preview"><div className="preview-heading"><span><span className="live-dot" /> LIVE PREVIEW</span><span>PORTRAIT · 9:16</span></div><div className="preview-stage"><div className="flyer-wrap"><FlyerPreview name={name} title={title} photo={photo} zoom={zoom} position={position} onReady={onReady} onError={onError} /></div></div><div className="preview-footer"><span><Check />Official workshop template</span><span>16 OCT 2026</span></div></section>
       </div>
     </main>
     <footer className="app-footer"><span>LEARN <span>/</span> APPLY <span>/</span> GROW</span><span>Made for the Techsquad community <ArrowLeft /></span></footer>
