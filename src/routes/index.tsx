@@ -120,7 +120,7 @@ function Index() {
       <span className="workshop-chip"><span /> AI WORKFLOW LAB</span>
     </header>
     <main className="studio-main">
-      <div className="page-heading"><div><div className="eyebrow"><span className="eyebrow-line" /> MAKE IT YOURS</div><h1>Your seat. Your flyer.</h1><p>A little personal touch for a big step forward.</p></div><div className="event-summary"><span className="event-dot" /><div><strong>{EVENT_DATE}</strong><span>7:00pm – 9:00pm · Online</span></div></div></div>
+      <div className="page-heading"><div><div className="eyebrow"><span className="eyebrow-line" /> MAKE IT YOURS</div><h1>Your seat. Your flyer.</h1><p>A little personal touch for a big step forward.</p></div><div className="event-summary"><span className="event-dot" /><div><strong>{EVENT_DATE}</strong><span>8:00pm – 10:00pm · Online</span></div></div></div>
       <div className="studio-layout">
         <section className="editor" aria-label="Personalize your flyer">
           <div className="section-heading"><h2>Personalize your flyer</h2><span className="step-count">{complete} / 3 complete</span></div>
